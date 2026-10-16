@@ -87,7 +87,7 @@ Press **Settings** in the device.
 - **Database key.** Paste your own Rekordbox database key here (see [The database key](#the-database-key)). It is saved in a file only your user can read (`settings.json`, mode 600) and is never shown again; **Remove saved key** deletes it. The device has no key of its own and works without one only in the sense that it tells you it is missing.
 - **Components.** Shows whether the private environment is installed and lets you install or reinstall it. It holds the SQLCipher driver that opens the database, and nothing else.
 
-![The Settings panel](docs/images/settings.png)
+![The Settings panel when no key is saved yet](docs/images/settings.png)
 
 ## Privacy and safety
 

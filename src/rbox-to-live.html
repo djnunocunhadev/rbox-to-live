@@ -410,6 +410,7 @@
       #sec-key { grid-column: 1; grid-row: 2; }
       #sec-components { grid-column: 2; grid-row: 1 / span 2; }
       .field { padding: 2px 5px; }
+      .panel .message { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     }
   </style>
 </head>
@@ -493,7 +494,6 @@
         </section>
         <section id="sec-key">
           <h3>Database key</h3>
-          <div class="hint">Rekordbox encrypts its library. This project does not include or look up the key: you enter your own key here.</div>
           <input id="set-key" class="field" type="password" placeholder="Paste your Rekordbox database key" spellcheck="false" autocomplete="off">
           <div class="row"><span id="set-keystate" class="hint" style="flex:1 1 auto;"></span><button id="set-keyclear" class="btn-subtle" type="button">Remove saved key</button></div>
         </section>
@@ -908,6 +908,7 @@
 
     function setMessage(text, kind = '') {
       $('set-message').textContent = text || '';
+      $('set-message').title = text || '';
       $('set-message').className = `message ${kind}`;
     }
 
@@ -918,7 +919,7 @@
       $('set-dbdetected').title = s.detectedDbPath || '';
       $('set-keystate').textContent = s.hasKey
         ? 'A key is saved. Paste another to replace it.'
-        : 'No key saved. The device cannot open the library until you enter your own key.';
+        : 'No key saved. Enter your own; this project does not provide one.';
       $('set-keyclear').style.display = s.hasKey ? '' : 'none';
       $('set-key').value = '';
       $('set-components').textContent = s.components.privateEnvironment
@@ -933,6 +934,11 @@
       for (const id of ['sec-db', 'sec-key', 'sec-components']) $(id).classList.toggle('attention', id === focusSection);
       setMessage(message || '', message ? 'bad' : '');
       try { await refreshSettings(); } catch (err) { setMessage('Could not read the settings: ' + err.message, 'bad'); }
+      // Bring the section that needs attention into view; the compact panel scrolls.
+      if (focusSection) {
+        $(focusSection).scrollIntoView({ block: 'nearest' });
+        if (focusSection === 'sec-key') $('set-key').focus();
+      }
     }
 
     function closeSettings() { $('settings').classList.remove('open'); }

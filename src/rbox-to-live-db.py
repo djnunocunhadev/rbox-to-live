@@ -129,8 +129,7 @@ def resolve_key(manual: str | None) -> str:
         return str(manual).strip()
     raise ReaderError(
         "key-missing",
-        "No database key. Enter your own Rekordbox database key in the device settings. "
-        "This project does not include one and cannot help you find it.",
+        "No database key. Enter your own in the device settings; this project does not include one.",
     )
 
 
