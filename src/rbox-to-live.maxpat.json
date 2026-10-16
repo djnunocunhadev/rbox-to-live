@@ -1,0 +1,474 @@
+{
+	"patcher": {
+		"fileversion": 1,
+		"appversion": {
+			"major": 9,
+			"minor": 0,
+			"revision": 0,
+			"architecture": "arm64",
+			"modernui": 1
+		},
+		"classnamespace": "box",
+		"rect": [
+			0,
+			0,
+			800,
+			520
+		],
+		"bglocked": 0,
+		"openinpresentation": 1,
+		"default_fontsize": 12.0,
+		"default_fontface": 0,
+		"default_fontname": "Ableton Sans",
+		"project": {
+			"version": 1,
+			"creationdate": 3590052493,
+			"modificationdate": 3590052493,
+			"viewrect": [
+				0.0,
+				0.0,
+				300.0,
+				500.0
+			],
+			"autoorganize": 1,
+			"hideprojectwindow": 1,
+			"showdependencies": 1,
+			"autolocalize": 0,
+			"contents": {
+				"patchers": {}
+			},
+			"layout": {},
+			"searchpath": {},
+			"detailsvisible": 0,
+			"amxdtype": 1633771873,
+			"readonly": 0,
+			"devpathtype": 0,
+			"devpath": ".",
+			"sortmode": 0,
+			"viewmode": 0
+		},
+		"gridonopen": 1,
+		"gridsize": [
+			15.0,
+			15.0
+		],
+		"boxes": [
+			{
+				"box": {
+					"id": "obj-1",
+					"maxclass": "newobj",
+					"text": "plugin~",
+					"patching_rect": [
+						20.0,
+						20.0,
+						50.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-2",
+					"maxclass": "newobj",
+					"text": "plugout~",
+					"patching_rect": [
+						20.0,
+						60.0,
+						60.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-3",
+					"maxclass": "jweb",
+					"rendermode": 1,
+					"patching_rect": [
+						20.0,
+						110.0,
+						680.0,
+						390.0
+					],
+					"presentation": 1,
+					"presentation_rect": [
+						0.0,
+						0.0,
+						720.0,
+						169.0
+					],
+					"ignoreclick": 0
+				}
+			},
+			{
+				"box": {
+					"id": "obj-18",
+					"maxclass": "newobj",
+					"text": "live.thisdevice",
+					"patching_rect": [
+						20.0,
+						750.0,
+						90.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-21",
+					"maxclass": "newobj",
+					"text": "loadbang",
+					"patching_rect": [
+						120.0,
+						750.0,
+						60.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-19",
+					"maxclass": "newobj",
+					"text": "delay 150",
+					"patching_rect": [
+						20.0,
+						790.0,
+						65.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-20",
+					"maxclass": "message",
+					"text": "readfile rbox-to-live.html",
+					"patching_rect": [
+						20.0,
+						830.0,
+						155.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-5",
+					"maxclass": "newobj",
+					"text": "node.script rbox-to-live-node.js @autostart 1",
+					"patching_rect": [
+						20.0,
+						520.0,
+						270.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-7",
+					"maxclass": "newobj",
+					"text": "route liveimport select_track",
+					"patching_rect": [
+						20.0,
+						560.0,
+						160.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-11",
+					"maxclass": "newobj",
+					"text": "prepend liveimport",
+					"patching_rect": [
+						20.0,
+						600.0,
+						120.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-14",
+					"maxclass": "newobj",
+					"text": "prepend select_track",
+					"patching_rect": [
+						150.0,
+						600.0,
+						130.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-13",
+					"maxclass": "newobj",
+					"text": "deferlow",
+					"patching_rect": [
+						20.0,
+						635.0,
+						65.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-8",
+					"maxclass": "newobj",
+					"text": "js rbox-to-live-live.js",
+					"patching_rect": [
+						20.0,
+						670.0,
+						150.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-9",
+					"maxclass": "newobj",
+					"text": "route live_result",
+					"patching_rect": [
+						20.0,
+						680.0,
+						110.0,
+						22.0
+					]
+				}
+			},
+			{
+				"box": {
+					"id": "obj-12",
+					"maxclass": "newobj",
+					"text": "prepend live_result",
+					"patching_rect": [
+						20.0,
+						720.0,
+						130.0,
+						22.0
+					]
+				}
+			}
+		],
+		"lines": [
+			{
+				"patchline": {
+					"source": [
+						"obj-1",
+						0
+					],
+					"destination": [
+						"obj-2",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-1",
+						1
+					],
+					"destination": [
+						"obj-2",
+						1
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-18",
+						0
+					],
+					"destination": [
+						"obj-19",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-21",
+						0
+					],
+					"destination": [
+						"obj-19",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-19",
+						0
+					],
+					"destination": [
+						"obj-20",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-20",
+						0
+					],
+					"destination": [
+						"obj-3",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-5",
+						0
+					],
+					"destination": [
+						"obj-7",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-7",
+						0
+					],
+					"destination": [
+						"obj-11",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-7",
+						1
+					],
+					"destination": [
+						"obj-14",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-11",
+						0
+					],
+					"destination": [
+						"obj-13",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-14",
+						0
+					],
+					"destination": [
+						"obj-13",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-13",
+						0
+					],
+					"destination": [
+						"obj-8",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-8",
+						0
+					],
+					"destination": [
+						"obj-9",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-9",
+						0
+					],
+					"destination": [
+						"obj-12",
+						0
+					]
+				}
+			},
+			{
+				"patchline": {
+					"source": [
+						"obj-12",
+						0
+					],
+					"destination": [
+						"obj-5",
+						0
+					]
+				}
+			}
+		],
+		"dependency_cache": [
+			{
+				"name": "rbox-to-live.html",
+				"bootpath": ".",
+				"patcherrelativepath": ".",
+				"type": "HTML",
+				"implicit": 1
+			},
+			{
+				"name": "rbox-to-live-node.js",
+				"bootpath": ".",
+				"patcherrelativepath": ".",
+				"type": "TEXT",
+				"implicit": 1
+			},
+			{
+				"name": "rbox-to-live-db.py",
+				"bootpath": ".",
+				"patcherrelativepath": ".",
+				"type": "TEXT",
+				"implicit": 1
+			},
+			{
+				"name": "rbox-to-live-live.js",
+				"bootpath": ".",
+				"patcherrelativepath": ".",
+				"type": "TEXT",
+				"implicit": 1
+			}
+		],
+		"autosave": 0
+	}
+}

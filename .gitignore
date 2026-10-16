@@ -1,0 +1,24 @@
+# Build output
+dist/
+*.zip
+
+# macOS and editor files
+.DS_Store
+.claude/
+.gstack/
+
+# Python
+__pycache__/
+*.pyc
+
+# Local library exports, Live sets and audio are for development only and never belong in the repository.
+*.als
+*.alp
+*.xml
+*.mp3
+*.wav
+*.aif
+*.aiff
+*.db
+*.db-wal
+*.db-shm

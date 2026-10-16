@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest an improvement
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome. Out of scope: anything that writes to a Rekordbox library, and anything that finds, derives or supplies a Rekordbox database key. Do not paste keys or library files.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like, and why
+    validations:
+      required: true
+  - type: checkboxes
+    id: safe
+    attributes:
+      label: Before you send
+      options:
+        - label: This does not need the project to provide or find a database key, and it does not write to a Rekordbox library.
+          required: true

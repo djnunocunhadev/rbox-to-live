@@ -1,0 +1,28 @@
+# The Python package the device installs into its own private environment (Settings > Install components), so nothing
+# is added to your system Python. It is the SQLCipher database driver and nothing else: no Rekordbox key, and no other
+# package, is downloaded. Every file is pinned by hash, so pip refuses anything that differs from what was reviewed.
+sqlcipher3-wheels==0.5.7 \
+    --hash=sha256:16fc3d25e6c116ddce93745308dc5935ef8c6d5f58638cf7c62c58918537519a \
+    --hash=sha256:1844e7243b0b37deadb4c5a3f1e46a9aa49f56c6afd52dbe3a73c699cbc33f0d \
+    --hash=sha256:1f3325fee4698fadbfa9b8245f213f7f3ecc3f0c86a761a2b26c787d54d3ecd1 \
+    --hash=sha256:2e54097f6135b4c3704ea4f2d38daf7298ab711b479c12f8a0e108191b91d762 \
+    --hash=sha256:3382d7202b857a98fb53ead5b7f2eacf9eea8baa390833afaca1601940c6be74 \
+    --hash=sha256:3ebbaa3d12a4222d82b36d42249d61d157ac6d31e7977e6cf9f5ce6a9eaa3ee1 \
+    --hash=sha256:4cf1e79ab481f7197917ec3dd87fa3875a3927c846df26196ac3bcbfef0d480b \
+    --hash=sha256:670f493bf5a9e70e86b0ae680a8bbf96aeaaf526c5018262186e6d7c52f021b1 \
+    --hash=sha256:6831fd121adf8374ecfb67b63d9bdfc3bc405e7103e35dd3152f7f2d2bbe87ae \
+    --hash=sha256:75636e5eea2669cc0d31d39c639dc69769824020456ba7b181a0c4836b221952 \
+    --hash=sha256:80a751e85973fbf61a76c6f20ec78d94f1b3b5f6f7c38594ece92c1c3d8603a3 \
+    --hash=sha256:8c4a6dd38e9c4eff2304ea0751e8c5612394f277e63f007ae85118d9ce49b427 \
+    --hash=sha256:98439abc4213c32d6232ff970b87968798323312d37796db7e77a23387965f80 \
+    --hash=sha256:9d03491d9d4023cca969a4c87f01ea845368defcc52ea7cd71ce93deac3df286 \
+    --hash=sha256:b822211ea0d50500bc8dc82863fa570543e0f224359ccb46b7675a24c89983f5 \
+    --hash=sha256:b9b8863355922656f2de6aeffcbb9c900b774ae90808e2ba35d9cb95b08ec7d9 \
+    --hash=sha256:be13828ae791836bfd58152fc89f313b026d6c2a17a60a114af1f4db9d81b1ce \
+    --hash=sha256:c3b27edf1e8cff3cb3ae624ea506298e2cbb3123689a5931fc2efacc54e262be \
+    --hash=sha256:cb4693ccbf1d867c99855413e5b8bb8b990a881e16da7beab714b7fe75e9bc11 \
+    --hash=sha256:d6b9da72a32581d531baab41424219a7d07b6910ea9cedc6238fecfff8247473 \
+    --hash=sha256:d7d7bfaa66fbf8e298511a1973249178ae9dc8b996ed35bcda4115f4ace38500 \
+    --hash=sha256:ede88f6f05b47e1c38b619f8e97c3a4e79003caca55da290fbcc23f8f49b6165 \
+    --hash=sha256:f0c88e009b1908a98e3a4b7d31c6cad2c356d721a967b1f87a0b3f7f6cee1470 \
+    --hash=sha256:fe9fcd2773efe18018a060a369d92f2026a8ecd0e22b8f20ce42214b0d659665

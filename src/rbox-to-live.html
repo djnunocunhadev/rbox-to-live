@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RBox to Live</title>
+  <style>
+    :root {
+      --bg: #242424;
+      --panel: #1c1c1c;
+      --header: #2b2b2b;
+      --border: #141414;
+      --border-light: #333333;
+      --text: #d8d8d8;
+      --text-muted: #888888;
+      --text-bright: #ffffff;
+      --selected: #394b61;
+      --accent: #ff764d;
+      --accent-hover: #ff8c69;
+      --green: #48c774;
+      --red: #f14668;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Ableton Sans", "Segoe UI", sans-serif;
+      font-size: 11px;
+      line-height: 1.3;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    input, button { font: inherit; }
+
+    /* Top Strip (26px) */
+    .top-strip {
+      height: 26px;
+      background: var(--header);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      gap: 8px;
+    }
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: var(--text-bright);
+      letter-spacing: 0.02em;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      display: inline-block;
+    }
+    .status-dot.ok { background: var(--green); box-shadow: 0 0 5px rgba(72,199,116,0.6); }
+    .status-dot.bad { background: var(--red); }
+    .status-text {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-subtle {
+      background: #333333;
+      color: var(--text);
+      border: 1px solid #444444;
+      border-radius: 3px;
+      padding: 2px 7px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .btn-subtle:hover { background: #3d3d3d; color: var(--text-bright); }
+    .btn-subtle:active { background: #262626; }
+
+    /* 3-Column Grid */
+    .grid-container {
+      display: grid;
+      grid-template-columns: 160px 1fr 210px;
+      height: calc(100% - 60px);
+      width: 100%;
+    }
+    .action-bar {
+      height: 34px;
+      background: var(--header);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 8px;
+    }
+    .action-bar .select-subtle { flex: 0 0 auto; }
+    .action-bar .detail-status { flex: 1 1 0; min-width: 0; }
+    .action-bar .btn-import { flex: 0 0 auto; padding: 5px 12px; }
+    .action-bar .btn-subtle { flex: 0 0 auto; padding: 4px 8px; }
+    .toggle { display: flex; align-items: center; gap: 3px; font-size: 10px; color: var(--text-muted); white-space: nowrap; flex: 0 0 auto; }
+    .toggle input { margin: 0; accent-color: var(--accent); }
+
+    /* Col 1: Playlists */
+    .col-playlists {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .col-header {
+      height: 22px;
+      padding: 4px 8px;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .scroll-list {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .pl-item {
+      padding: 4px 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,0.15);
+    }
+    .pl-folder { padding: 4px 8px; color: var(--text-muted); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid rgba(0,0,0,0.15); }
+    .pl-item:hover { background: rgba(255,255,255,0.04); }
+    .pl-item.active { background: var(--selected); color: #fff; font-weight: 500; }
+    .pl-count { color: var(--text-muted); font-size: 9px; font-variant-numeric: tabular-nums; }
+    .pl-item.active .pl-count { color: #cfd8e3; }
+
+    /* Col 2: Tracks */
+    .col-tracks {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .tracks-toolbar {
+      padding: 4px 6px;
+      border-bottom: 1px solid var(--border);
+      background: var(--header);
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .search-input {
+      flex: 1;
+      background: #181818;
+      color: var(--text-bright);
+      border: 1px solid var(--border-light);
+      border-radius: 3px;
+      padding: 3px 6px;
+      outline: none;
+      font-size: 11px;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: #666; }
+
+    .track-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 4px 8px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0,0,0,0.18);
+      align-items: center;
+    }
+    .track-row:hover { background: rgba(255,255,255,0.04); }
+    .track-row.selected { background: var(--selected); color: #fff; }
+    .track-row:focus { outline: 1px solid var(--accent); outline-offset: -1px; }
+    .track-main { overflow: hidden; }
+    .track-title {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-bright);
+    }
+    .track-artist {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .track-row.selected .track-artist { color: #c4d0de; }
+    .track-meta {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .track-meta span { display: block; }
+    .track-row.selected .track-meta { color: #d0dbe8; }
+    /* Tracks with Rekordbox phrase analysis carry an accent bar and a label; the rest say they have none. */
+    .track-row.has-phrases { box-shadow: inset 3px 0 0 var(--accent); }
+    .phrase-tag { display: block; margin-top: 2px; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); }
+    .phrase-tag.on { color: var(--accent); font-weight: 600; }
+    .track-row.selected .phrase-tag.on { color: #fff; }
+
+    /* Col 3: Details & Actions */
+    .col-details {
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px;
+      overflow: hidden;
+    }
+    .detail-top { overflow: hidden; }
+    .detail-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-bright);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .detail-artist {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .chip {
+      background: #2a2a2a;
+      color: #b5b5b5;
+      border: 1px solid #383838;
+      border-radius: 3px;
+      padding: 2px 5px;
+      font-size: 9px;
+      font-variant-numeric: tabular-nums;
+    }
+    .cues-box {
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+      max-height: 48px;
+      overflow-y: auto;
+      line-height: 1.35;
+    }
+
+    .detail-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 6px;
+    }
+    .btn-import {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      border-radius: 3px;
+      padding: 6px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.1s ease;
+      letter-spacing: 0.02em;
+    }
+    .btn-import:disabled {
+      opacity: 0.35;
+      cursor: default;
+      background: #444;
+      color: #888;
+    }
+    .option-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+    .select-subtle {
+      flex: 1;
+      background: #1c1c1c;
+      border: 1px solid #383838;
+      border-radius: 3px;
+      color: #c0c0c0;
+      font-family: inherit;
+      font-size: 9px;
+      padding: 3px 4px;
+      outline: none;
+      cursor: pointer;
+    }
+    .select-subtle:focus {
+      border-color: #555;
+      color: #fff;
+    }
+    .detail-status {
+      font-size: 9px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-height: 12px;
+    }
+    .detail-status.ok {
+      color: #5ad67d;
+      font-weight: 600;
+    }
+    .detail-status.bad {
+      color: #ff5555;
+    }
+    .load-more-btn {
+      width: 100%;
+      padding: 6px;
+      background: #282828;
+      border: 1px solid #383838;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 10px;
+      text-align: center;
+    }
+    .load-more-btn:hover { background: #333; color: var(--text-bright); }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #383838; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #505050; }
+
+    /* Live gives a Max device a short, fixed-height area (about 169 px), so a short window gets a compact layout:
+       slimmer bars, and one line per track. The same page opened in a browser (Large view) uses the roomy layout. */
+    @media (max-height: 240px) {
+      .top-strip { height: 20px; padding: 0 6px; }
+      .action-bar { height: 26px; gap: 4px; padding: 0 6px; }
+      .grid-container { grid-template-columns: 140px 1fr 190px; height: calc(100% - 46px); }
+      .col-header { height: 17px; padding: 2px 6px; }
+      .pl-item { padding: 2px 6px; }
+      .pl-folder { padding: 2px 6px; }
+      .tracks-toolbar { padding: 2px 5px; }
+      .search-input { padding: 1px 5px; font-size: 10px; }
+      .track-row { padding: 1px 6px; gap: 6px; }
+      .track-main { display: flex; gap: 6px; align-items: baseline; min-width: 0; }
+      .track-title { flex: 0 1 auto; min-width: 0; }
+      .track-artist { flex: 1 1 0; min-width: 0; }
+      .track-meta { display: flex; gap: 6px; align-items: baseline; }
+      .track-meta span { display: inline; }
+      .phrase-tag { display: inline; margin: 0; }
+      .col-details { padding: 4px 6px; }
+      .chips { margin-top: 3px; }
+      .cues-box { margin-top: 3px; max-height: 30px; }
+      .btn-import { padding: 3px 10px; }
+      .select-subtle { padding: 1px 3px; }
+    }
+
+    /* Settings panel */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 10; }
+    .overlay.open { display: flex; }
+    .panel { width: min(560px, 96%); max-height: 96%; background: var(--bg); border: 1px solid #4a4a4a; border-radius: 4px; display: flex; flex-direction: column; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: var(--header); border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text-bright); }
+    .panel-body { padding: 8px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .panel-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; background: var(--header); border-top: 1px solid var(--border); }
+    .panel section { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .panel h3 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+    .panel .hint { font-size: 10px; color: var(--text-muted); }
+    #set-dbdetected { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .panel .row { display: flex; align-items: center; gap: 6px; }
+    .field { width: 100%; background: #1a1a1a; color: var(--text-bright); border: 1px solid #444; border-radius: 3px; padding: 4px 6px; font-size: 11px; user-select: text; -webkit-user-select: text; }
+    .field:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+    .log { max-height: 70px; overflow-y: auto; background: #1a1a1a; border: 1px solid #333; border-radius: 3px; padding: 3px 6px; font-family: ui-monospace, Menlo, monospace; font-size: 9px; color: #aaa; white-space: pre-wrap; display: none; user-select: text; -webkit-user-select: text; }
+    .log.open { display: block; }
+    .panel .message { font-size: 10px; flex: 1 1 auto; min-width: 0; }
+    .panel .message.ok { color: var(--green); }
+    .panel .message.bad { color: var(--red); }
+    .panel section.attention h3 { color: var(--accent); }
+
+    /* The settings panel in the compact layout: full width, two columns, so nothing needs scrolling. */
+    @media (max-height: 240px) {
+      .overlay { align-items: stretch; background: rgba(0,0,0,0.35); }
+      .panel { width: 100%; max-height: none; border: 0; border-radius: 0; box-shadow: none; }
+      .panel-head { padding: 2px 8px; }
+      .panel-foot { padding: 3px 8px; }
+      .panel-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; gap: 4px 14px; padding: 5px 8px; }
+      #sec-db { grid-column: 1; grid-row: 1; }
+      #sec-key { grid-column: 1; grid-row: 2; }
+      #sec-components { grid-column: 2; grid-row: 1 / span 2; }
+      .field { padding: 2px 5px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-strip">
+    <div class="brand-section">
+      <span id="dot" class="status-dot"></span>
+      <span>RBox to Live</span>
+      <span id="state-text" class="status-text">Connecting…</span>
+    </div>
+    <div class="top-controls">
+      <button id="large-btn" class="btn-subtle" type="button" title="Open this window full size in your browser">Large view</button>
+      <button id="settings-btn" class="btn-subtle" type="button" title="Database file, database key and components">Settings</button>
+      <button id="connect-btn" class="btn-subtle" type="button">Connect</button>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <select id="target-track" class="select-subtle" title="Target track in Ableton Live">
+      <option value="new">New Track</option>
+      <option value="current">Current Track</option>
+    </select>
+    <select id="target-view" class="select-subtle" title="Ableton views to populate">
+      <option value="both">Timeline + Cues</option>
+      <option value="arrangement">Timeline Only</option>
+      <option value="session">Cues Only</option>
+    </select>
+    <select id="target-split" class="select-subtle" title="How to cut the track into clips: by Rekordbox song structure, by hot cues, or not at all">
+      <option value="structure">Split: Song Structure</option>
+      <option value="cues">Split: Hot Cues</option>
+      <option value="none">Split: None</option>
+    </select>
+    <label class="toggle" title="Add a Vocals track with a clip wherever Rekordbox hears vocals"><input id="target-vocals" type="checkbox" checked> Vocals</label>
+    <div id="detail-status" class="detail-status">Ready</div>
+    <button id="view-track-btn" class="btn-subtle" type="button" style="display:none;">Select Track in Live</button>
+    <button id="import-btn" class="btn-import" type="button" disabled>Import to Live</button>
+  </div>
+
+  <div class="grid-container">
+    <!-- Col 1: Playlists -->
+    <div class="col-playlists">
+      <div class="col-header">
+        <span>Playlists</span>
+      </div>
+      <div id="playlist-list" class="scroll-list">
+        <div style="padding:10px;color:#777;">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Col 2: Tracks -->
+    <div class="col-tracks">
+      <div class="tracks-toolbar">
+        <input id="search-input" class="search-input" placeholder="Search title, artist, album…" aria-label="Search Rekordbox">
+        <button id="all-btn" class="btn-subtle" type="button">All</button>
+      </div>
+      <div class="col-header"><span>Track · Artist</span><span>BPM · Key</span></div>
+      <div id="track-list" class="scroll-list">
+        <div style="padding:10px;color:#777;">Loading tracks…</div>
+      </div>
+    </div>
+
+    <!-- Col 3: Details & Import -->
+    <div class="col-details">
+      <div class="detail-top">
+        <div id="detail-title" class="detail-title">No track selected</div>
+        <div id="detail-artist" class="detail-artist">Double-click track to import</div>
+        <div id="detail-chips" class="chips"></div>
+        <div id="detail-cues" class="cues-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings" class="overlay" role="dialog" aria-label="Settings">
+    <div class="panel">
+      <div class="panel-head"><span>Settings</span><button id="settings-close" class="btn-subtle" type="button">Close</button></div>
+      <div class="panel-body">
+        <section id="sec-db">
+          <h3>Rekordbox database file</h3>
+          <input id="set-dbpath" class="field" placeholder="Leave empty to find it automatically" spellcheck="false" autocomplete="off">
+          <div id="set-dbdetected" class="hint"></div>
+        </section>
+        <section id="sec-key">
+          <h3>Database key</h3>
+          <div class="hint">Rekordbox encrypts its library. This project does not include or look up the key: you enter your own key here.</div>
+          <input id="set-key" class="field" type="password" placeholder="Paste your Rekordbox database key" spellcheck="false" autocomplete="off">
+          <div class="row"><span id="set-keystate" class="hint" style="flex:1 1 auto;"></span><button id="set-keyclear" class="btn-subtle" type="button">Remove saved key</button></div>
+        </section>
+        <section id="sec-components">
+          <h3>Components</h3>
+          <div class="row"><span id="set-components" class="hint" style="flex:1 1 auto;"></span><button id="set-install" class="btn-subtle" type="button">Install components</button></div>
+          <div id="set-setuplog" class="log"></div>
+        </section>
+      </div>
+      <div class="panel-foot"><div id="set-message" class="message"></div><button id="set-save" class="btn-import" type="button">Save and reconnect</button></div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const BRIDGE = 'http://127.0.0.1:37373';
+    // The bridge fills in a fresh random token each time it serves this page, and refuses requests without it.
+    const API_TOKEN = '__RBOX_TOKEN__';
+    const PLACEHOLDER = '__RBOX_' + 'TOKEN__';
+    const API_BASE = location.protocol === 'http:' ? location.origin : BRIDGE;
+
+    // Opened straight from the device folder there is no token yet. Wait for the bridge to start, then continue on the
+    // page it serves, which has the token.
+    if (API_TOKEN === PLACEHOLDER) {
+      document.addEventListener('DOMContentLoaded', () => {
+        $('state-text').textContent = 'Starting…';
+        const tryBridge = () => {
+          fetch(BRIDGE + '/status', { mode: 'no-cors' }).then(() => location.replace(BRIDGE + '/')).catch(() => setTimeout(tryBridge, 800));
+        };
+        tryBridge();
+      });
+    }
+
+    let tracks = [];
+    let playlists = [];
+    let selected = null;
+    let activePlaylist = null;
+    let searchTimer = null;
+    let lastStatus = null;
+    let libraryCount = 0;
+
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    async function api(endpoint, options = {}) {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers: { 'Content-Type': 'application/json', 'X-RBox-Token': API_TOKEN, ...(options.headers || {}) },
+      });
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(errorBody.error || `HTTP ${res.status}`);
+      }
+      return await res.json();
+    }
+
+    function setStatus(text, kind = '') {
+      $('state-text').textContent = text;
+      $('dot').className = `status-dot ${kind}`;
+    }
+
+    function renderTrackRows(payload) {
+      const items = Array.isArray(payload) ? payload : (payload?.items || []);
+      tracks = payload?.append ? [...tracks, ...items] : items;
+      const total = Number(payload?.total ?? tracks.length);
+
+      if (selected && !tracks.some(t => Number(t.id) === Number(selected.id))) {
+        clearSelection();
+      }
+
+      if (!tracks.length) {
+        $('track-list').innerHTML = '<div style="padding:12px;color:#777;">No tracks found.</div>';
+        return;
+      }
+
+      const rowsHtml = tracks.map(t => {
+        const isSel = selected?.id === t.id ? 'selected' : '';
+        const bpm = t.bpm ? `${Number(t.bpm).toFixed(1)}` : '';
+        const key = t.key ? esc(t.key) : '';
+        const meta = [bpm ? `<span>${bpm} BPM</span>` : '', key ? `<span>${key}</span>` : ''].join('');
+        const phraseTag = t.phrases
+          ? '<span class="phrase-tag on">Phrases</span>'
+          : '<span class="phrase-tag">No phrases</span>';
+        return `
+          <div class="track-row ${isSel}${t.phrases ? ' has-phrases' : ''}" data-id="${Number(t.id)}" role="button" tabindex="0">
+            <div class="track-main">
+              <div class="track-title">${esc(t.title)}</div>
+              <div class="track-artist">${esc(t.artist)}</div>
+            </div>
+            <div class="track-meta">${meta}${phraseTag}</div>
+          </div>
+        `;
+      }).join('');
+
+      const moreBtn = (activePlaylist === null && tracks.length < total)
+        ? `<button id="more-btn" class="load-more-btn" type="button">Load more (${tracks.length}/${total})</button>`
+        : '';
+
+      $('track-list').innerHTML = rowsHtml + moreBtn;
+
+      if ($('more-btn')) {
+        $('more-btn').addEventListener('click', () => {
+          doSearch($('search-input').value, tracks.length);
+        });
+      }
+
+      for (const row of $('track-list').querySelectorAll('.track-row')) {
+        const id = Number(row.dataset.id);
+        row.addEventListener('click', () => selectTrack(id));
+        row.addEventListener('dblclick', () => {
+          selectTrack(id);
+          doImport();
+        });
+        row.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            selectTrack(id);
+            doImport();
+          } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const rows = [...$('track-list').querySelectorAll('.track-row')];
+            const next = rows[rows.indexOf(row) + (e.key === 'ArrowDown' ? 1 : -1)];
+            if (next) {
+              next.focus();
+              next.scrollIntoView({ block: 'nearest' });
+              selectTrack(Number(next.dataset.id));
+            }
+          }
+        });
+      }
+    }
+
+    function renderPlaylists(items) {
+      playlists = Array.isArray(items) ? items : [];
+
+      // Playlists in folder order: each folder is a heading with its playlists indented under it. Smart playlists and
+      // folders that hold no playlist are left out.
+      const children = new Map();
+      for (const p of playlists) {
+        const key = p.parentId == null ? 0 : p.parentId;
+        if (!children.has(key)) children.set(key, []);
+        children.get(key).push(p);
+      }
+      const hasPlaylist = (p, level = 0) => p.kind === 'playlist'
+        || (p.kind === 'folder' && level < 10 && (children.get(p.id) || []).some((c) => hasPlaylist(c, level + 1)));
+      const rows = [];
+      const walk = (parentId, level) => {
+        for (const p of children.get(parentId) || []) {
+          if (!hasPlaylist(p)) continue;
+          rows.push({ p, level });
+          if (p.kind === 'folder' && level < 10) walk(p.id, level + 1);
+        }
+      };
+      walk(0, 0);
+
+      const allActive = activePlaylist === null ? 'active' : '';
+      let html = `<div class="pl-item ${allActive}" data-id="all">
+        <span>All Tracks</span>
+        <span class="pl-count">${libraryCount ? libraryCount.toLocaleString() : ''}</span>
+      </div>`;
+
+      html += rows.map(({ p, level }) => {
+        const pad = 8 + level * 10;
+        if (p.kind === 'folder') {
+          return `<div class="pl-folder" style="padding-left:${pad}px" title="${esc(p.name)}">${esc(p.name)}</div>`;
+        }
+        const active = activePlaylist === p.id ? 'active' : '';
+        return `
+          <div class="pl-item ${active}" data-id="${Number(p.id)}" style="padding-left:${pad}px" title="${esc(p.name)}">
+            <span style="overflow:hidden;text-overflow:ellipsis;">${esc(p.name)}</span>
+            <span class="pl-count">${Number(p.count) || ''}</span>
+          </div>
+        `;
+      }).join('');
+
+      $('playlist-list').innerHTML = html;
+
+      for (const item of $('playlist-list').querySelectorAll('.pl-item')) {
+        item.addEventListener('click', () => {
+          if (item.dataset.id === 'all') {
+            activePlaylist = null;
+            doSearch($('search-input').value, 0);
+          } else {
+            activePlaylist = Number(item.dataset.id);
+            loadPlaylist(activePlaylist);
+          }
+          renderPlaylists(playlists);
+        });
+      }
+    }
+
+    function clearSelection() {
+      selected = null;
+      $('detail-title').textContent = 'No track selected';
+      $('detail-artist').textContent = 'Double-click track to import';
+      $('detail-chips').innerHTML = '';
+      $('detail-cues').textContent = '';
+      $('import-btn').disabled = true;
+      $('view-track-btn').style.display = 'none';
+      $('detail-status').className = 'detail-status';
+      $('detail-status').textContent = 'Ready';
+    }
+
+    function selectTrack(id) {
+      selected = tracks.find(t => Number(t.id) === id) || null;
+      if (!selected) return;
+      $('view-track-btn').style.display = 'none';
+      $('detail-status').className = 'detail-status';
+
+      $('track-list').querySelectorAll('.track-row').forEach(r => {
+        r.classList.toggle('selected', Number(r.dataset.id) === id);
+      });
+
+      $('detail-title').textContent = selected.title || 'Untitled';
+      $('detail-artist').textContent = selected.artist || 'Unknown artist';
+
+      const cues = Array.isArray(selected.hotCues) ? selected.hotCues : [];
+      const chips = [
+        selected.bpm ? `${Number(selected.bpm).toFixed(1)} BPM` : null,
+        selected.key || null,
+        selected.lengthSec ? `${Math.floor(selected.lengthSec / 60)}:${String(Math.floor(selected.lengthSec % 60)).padStart(2, '0')}` : null,
+        cues.length ? `${cues.length} Cues` : 'No cues'
+      ].filter(Boolean);
+
+      $('detail-chips').innerHTML = chips.map(c => `<span class="chip">${esc(c)}</span>`).join('');
+
+      if (cues.length) {
+        $('detail-cues').textContent = cues.map(c => {
+          const min = Math.floor(c.ms / 60000);
+          const sec = String(Math.floor((c.ms / 1000) % 60)).padStart(2, '0');
+          return `${c.letter || 'Cue'} ${min}:${sec}`;
+        }).join(' · ');
+      } else {
+        $('detail-cues').textContent = 'No hot cues saved for this track.';
+      }
+
+      $('import-btn').disabled = !selected.local;
+      const phraseNote = selected.phrases ? 'Phrase analysis available' : 'No phrase analysis';
+      $('detail-status').textContent = selected.streaming
+        ? 'Streaming track: no local file to import'
+        : (selected.local ? `Ready to import · ${phraseNote}` : 'File unavailable: connect its music drive');
+    }
+
+    async function checkStatus() {
+      try {
+        const s = await api('/status');
+        if (s.online) {
+          libraryCount = Number(s.tracks || 0);
+          setStatus(`${libraryCount.toLocaleString()} tracks · read-only`, 'ok');
+          return true;
+        } else {
+          lastStatus = s;
+          setStatus(s.error ? 'Error' : 'Offline', s.error ? 'bad' : '');
+          if (s.error) $('detail-status').textContent = s.error;
+          return false;
+        }
+      } catch (err) {
+        setStatus('Offline');
+        return false;
+      }
+    }
+
+    // The reader can say what is wrong. Missing components, a missing key and a rejected key are fixed in Settings,
+    // so that panel opens by itself; a missing database (usually an unplugged drive) only says so.
+    function explainOffline() {
+      const code = lastStatus && lastStatus.errorCode;
+      if (code === 'deps' || code === 'key-missing' || code === 'key-rejected') {
+        openSettings(lastStatus.error, code === 'deps' ? 'sec-components' : 'sec-key');
+      } else if (code === 'db-missing') {
+        $('detail-status').textContent = 'Database not found: connect the drive, or set the file in Settings';
+      } else if (lastStatus && lastStatus.error) {
+        $('detail-status').textContent = lastStatus.error;
+      } else {
+        $('detail-status').textContent = 'Drive unmounted or database missing';
+      }
+    }
+
+    async function doConnect() {
+      setStatus('Connecting…');
+      $('detail-status').textContent = 'Connecting to library…';
+      try {
+        await api('/connect', { method: 'POST' });
+        let ready = false;
+        for (let i = 0; i < 25; i++) {
+          await new Promise(r => setTimeout(r, 200));
+          ready = await checkStatus();
+          if (ready) break;
+          if (lastStatus && lastStatus.error) break;
+        }
+        if (ready) {
+          $('detail-status').textContent = 'Connected';
+          await loadPlaylists();
+          await doSearch('', 0);
+        } else {
+          explainOffline();
+        }
+      } catch (err) {
+        setStatus('Offline', 'bad');
+        $('detail-status').textContent = 'Connection error';
+      }
+    }
+
+    async function doSearch(query, offset = 0) {
+      try {
+        const data = await api(`/search?q=${encodeURIComponent(query || '')}&offset=${offset}`);
+        renderTrackRows(data);
+      } catch (err) {
+        $('detail-status').textContent = 'Search failed';
+      }
+    }
+
+    async function loadPlaylists() {
+      try {
+        const data = await api('/playlists');
+        renderPlaylists(data);
+      } catch (err) {
+        $('detail-status').textContent = 'Playlists error';
+      }
+    }
+
+    async function loadPlaylist(id) {
+      try {
+        const data = await api(`/playlist?id=${id}`);
+        renderTrackRows(data);
+      } catch (err) {
+        $('detail-status').textContent = 'Playlist load error';
+      }
+    }
+
+    async function doImport() {
+      if (!selected || !selected.local) return;
+      $('import-btn').disabled = true;
+      $('view-track-btn').style.display = 'none';
+      $('detail-status').className = 'detail-status';
+      $('detail-status').textContent = 'Importing to Live…';
+
+      const targetTrack = $('target-track').value;
+      const targetView = $('target-view').value;
+
+      try {
+        await api('/import', {
+          method: 'POST',
+          body: JSON.stringify({
+            id: Number(selected.id),
+            targetTrack,
+            targetView,
+            split: $('target-split').value,
+            vocals: $('target-vocals').checked,
+          }),
+        });
+
+        // Poll import status
+        let lastCreatedTrackId = 0;
+        const poll = setInterval(async () => {
+          try {
+            const s = await api('/import-status');
+            $('detail-status').textContent = s.message || 'Processing…';
+            if (s.newTrackId) lastCreatedTrackId = s.newTrackId;
+
+            if (!s.inProgress) {
+              clearInterval(poll);
+              $('import-btn').disabled = !selected?.local;
+              if (s.ok) {
+                $('detail-status').className = 'detail-status ok';
+                if (lastCreatedTrackId && targetTrack === 'new') {
+                  $('view-track-btn').style.display = 'block';
+                  $('view-track-btn').dataset.trackId = String(lastCreatedTrackId);
+                }
+              } else {
+                $('detail-status').className = 'detail-status bad';
+              }
+            }
+          } catch {
+            clearInterval(poll);
+            $('import-btn').disabled = !selected?.local;
+          }
+        }, 200);
+      } catch (err) {
+        $('detail-status').className = 'detail-status bad';
+        $('detail-status').textContent = 'Import failed: ' + err.message;
+        $('import-btn').disabled = !selected?.local;
+      }
+    }
+
+    // Attach controls
+    $('connect-btn').addEventListener('click', doConnect);
+    $('all-btn').addEventListener('click', () => {
+      activePlaylist = null;
+      renderPlaylists(playlists);
+      doSearch($('search-input').value, 0);
+    });
+    $('search-input').addEventListener('input', () => {
+      if (activePlaylist !== null) {
+        activePlaylist = null;
+        renderPlaylists(playlists);
+      }
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => doSearch($('search-input').value, 0), 220);
+    });
+    $('view-track-btn').addEventListener('click', async () => {
+      const tid = Number($('view-track-btn').dataset.trackId);
+      if (tid) {
+        await api('/select-track', {
+          method: 'POST',
+          body: JSON.stringify({ id: tid }),
+        }).catch(() => {});
+      }
+    });
+    $('import-btn').addEventListener('click', doImport);
+
+    // Settings panel
+    let setupTimer = null;
+
+    function setMessage(text, kind = '') {
+      $('set-message').textContent = text || '';
+      $('set-message').className = `message ${kind}`;
+    }
+
+    async function refreshSettings() {
+      const s = await api('/settings');
+      $('set-dbpath').value = s.dbPath || '';
+      $('set-dbdetected').textContent = s.detectedDbPath ? `Using: ${s.detectedDbPath}` : 'Not connected yet.';
+      $('set-dbdetected').title = s.detectedDbPath || '';
+      $('set-keystate').textContent = s.hasKey
+        ? 'A key is saved. Paste another to replace it.'
+        : 'No key saved. The device cannot open the library until you enter your own key.';
+      $('set-keyclear').style.display = s.hasKey ? '' : 'none';
+      $('set-key').value = '';
+      $('set-components').textContent = s.components.privateEnvironment
+        ? 'Installed (private Python environment).'
+        : 'Not installed. One-time download of the reader components.';
+      $('set-install').textContent = s.components.privateEnvironment ? 'Reinstall components' : 'Install components';
+      return s;
+    }
+
+    async function openSettings(message, focusSection) {
+      $('settings').classList.add('open');
+      for (const id of ['sec-db', 'sec-key', 'sec-components']) $(id).classList.toggle('attention', id === focusSection);
+      setMessage(message || '', message ? 'bad' : '');
+      try { await refreshSettings(); } catch (err) { setMessage('Could not read the settings: ' + err.message, 'bad'); }
+    }
+
+    function closeSettings() { $('settings').classList.remove('open'); }
+
+    async function saveSettings() {
+      setMessage('Saving…');
+      try {
+        await api('/settings', { method: 'POST', body: JSON.stringify({ dbPath: $('set-dbpath').value, key: $('set-key').value }) });
+        let status = null;
+        for (let i = 0; i < 40; i++) {
+          await new Promise(r => setTimeout(r, 250));
+          status = await api('/status');
+          if (status.online || status.error) break;
+        }
+        lastStatus = status;
+        if (status && status.online) {
+          setMessage('Connected.', 'ok');
+          closeSettings();
+          libraryCount = Number(status.tracks || 0);
+          setStatus(`${libraryCount.toLocaleString()} tracks · read-only`, 'ok');
+          $('detail-status').textContent = 'Connected';
+          await loadPlaylists();
+          await doSearch('', 0);
+        } else {
+          setMessage((status && status.error) || 'Could not connect yet.', 'bad');
+          setStatus('Error', 'bad');
+          await refreshSettings();
+        }
+      } catch (err) {
+        setMessage('Could not save: ' + err.message, 'bad');
+      }
+    }
+
+    async function installComponents() {
+      $('set-install').disabled = true;
+      $('set-setuplog').classList.add('open');
+      $('set-setuplog').textContent = 'Starting…';
+      setMessage('Installing components. This needs an internet connection and takes a minute or two.');
+      try {
+        await api('/setup', { method: 'POST' });
+      } catch (err) {
+        setMessage('Could not start the install: ' + err.message, 'bad');
+        $('set-install').disabled = false;
+        return;
+      }
+      clearInterval(setupTimer);
+      setupTimer = setInterval(async () => {
+        try {
+          const st = await api('/setup-status');
+          $('set-setuplog').textContent = (st.lines || []).join('\n') || st.message || '';
+          $('set-setuplog').scrollTop = $('set-setuplog').scrollHeight;
+          if (st.state === 'done') {
+            clearInterval(setupTimer);
+            $('set-install').disabled = false;
+            await new Promise(r => setTimeout(r, 1500));
+            await saveSettings();
+          } else if (st.state === 'error') {
+            clearInterval(setupTimer);
+            $('set-install').disabled = false;
+            setMessage(st.message || 'The install failed.', 'bad');
+          }
+        } catch (_) {
+          clearInterval(setupTimer);
+          $('set-install').disabled = false;
+        }
+      }, 1000);
+    }
+
+    $('large-btn').addEventListener('click', () => {
+      api('/open-view', { method: 'POST' }).catch((err) => { $('detail-status').textContent = 'Could not open the browser: ' + err.message; });
+    });
+    $('settings-btn').addEventListener('click', () => openSettings());
+    $('settings-close').addEventListener('click', closeSettings);
+    $('set-save').addEventListener('click', saveSettings);
+    $('set-install').addEventListener('click', installComponents);
+    $('set-keyclear').addEventListener('click', async () => {
+      try {
+        await api('/settings', { method: 'POST', body: JSON.stringify({ clearKey: true }) });
+        await refreshSettings();
+        setMessage('Saved key removed.', 'ok');
+      } catch (err) {
+        setMessage('Could not remove the key: ' + err.message, 'bad');
+      }
+    });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeSettings(); });
+
+    // Initial boot
+    async function init() {
+      for (let i = 0; i < 20; i++) {
+        try {
+          const ok = await checkStatus();
+          if (ok) {
+            await loadPlaylists();
+            await doSearch('', 0);
+            return;
+          }
+          await doConnect();
+          return;
+        } catch (_) {
+          await new Promise(r => setTimeout(r, 200));
+        }
+      }
+    }
+
+    if (API_TOKEN !== PLACEHOLDER) init();
+  </script>
+</body>
+</html>

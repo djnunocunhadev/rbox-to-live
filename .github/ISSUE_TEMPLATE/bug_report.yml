@@ -1,0 +1,54 @@
+name: Bug report
+description: Something does not work as the README says it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste your Rekordbox database key, your `master.db`, or your `settings.json` here.** They are private, and anything posted in an issue is public once the repository is. Issues that ask for help obtaining a key will be closed.
+  - type: input
+    id: version
+    attributes:
+      label: RBox to Live version
+      description: The `VERSION` file, or the number in the zip file name.
+    validations:
+      required: true
+  - type: input
+    id: live
+    attributes:
+      label: Ableton Live version
+      placeholder: "12.3"
+    validations:
+      required: true
+  - type: input
+    id: rekordbox
+    attributes:
+      label: Rekordbox version
+      placeholder: "7.x"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version and chip
+      placeholder: "macOS 15, Apple silicon"
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Messages
+      description: Text from the device header, the Settings panel or the Max window. Remove any file paths you would rather not share. Do not include keys.
+      render: text
+  - type: checkboxes
+    id: safe
+    attributes:
+      label: Before you send
+      options:
+        - label: I have not included my database key, my library files or my settings file.
+          required: true
